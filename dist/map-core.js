@@ -19,6 +19,30 @@ export function descendants(graph,id) {
   while(queue.length){const cur=queue.shift();for(const e of graph.edges)if(e.source===cur&&!found.has(e.target)){found.add(e.target);queue.push(e.target);}}
   return found;
 }
+// Rotate topic centers, keeping the cards and their text upright.
+export function branchPositions(positions,id,x,y,parent=null) {
+  const origin=positions.find(n=>n.id===id);
+  if(!origin)return [];
+  const old={x:origin.x+origin.w/2,y:origin.y+origin.h/2},next={x:x+origin.w/2,y:y+origin.h/2};
+  let angle=0;
+  if(parent){const px=parent.x+parent.w/2,py=parent.y+parent.h/2;
+    if(Math.hypot(old.x-px,old.y-py)>1&&Math.hypot(next.x-px,next.y-py)>1)
+      angle=Math.atan2(next.y-py,next.x-px)-Math.atan2(old.y-py,old.x-px);
+  }
+  const c=Math.cos(angle),s=Math.sin(angle);
+  return positions.map(n=>{const dx=n.x+n.w/2-old.x,dy=n.y+n.h/2-old.y;
+    return {id:n.id,x:next.x+dx*c-dy*s-n.w/2,y:next.y+dx*s+dy*c-n.h/2};});
+}
+export function dropTarget(graph,id,at) {
+  const excluded=descendants(graph,id);
+  return [...graph.nodes].reverse().find(n=>!excluded.has(n.id)&&contains(n,at))||null;
+}
+export function reparent(graph,id,parentId) {
+  if(!graph.nodes.some(n=>n.id===id)||!graph.nodes.some(n=>n.id===parentId)||descendants(graph,id).has(parentId))return false;
+  graph.edges=graph.edges.filter(e=>e.target!==id);
+  graph.edges.push({id:uid('e'),source:parentId,target:id,color:graph.nodes.find(n=>n.id===parentId).color});
+  return true;
+}
 export function ports(a,b) {
   const ac={x:a.x+a.w/2,y:a.y+a.h/2}, bc={x:b.x+b.w/2,y:b.y+b.h/2};
   const dx=bc.x-ac.x,dy=bc.y-ac.y;
