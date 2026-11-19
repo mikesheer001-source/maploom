@@ -1,6 +1,6 @@
 # Maploom — PDF Map Studio
 
-[Live app](https://maploom-pdf-editor.mikesheer001.chatgpt.site)
+[Live app](https://mikesheer001-source.github.io/maploom/)
 
 Import PDF mind maps, move and edit topics, connect branches, undo, save editable projects, and export sharp vector PDFs.
 
